@@ -1,0 +1,123 @@
+﻿@*@model IEnumerable<u19205547_HW06.Models.product>*@
+
+@*view now get a pagedlist object instea of a list object*@
+@model PagedList.IPagedList<u19205547_HW06.Models.product>
+@using PagedList.Mvc;
+<link href="~/Content/PagedList.css" rel="stylesheet" type="text/css" />
+
+
+<h2>Products</h2>
+
+
+@using (Html.BeginForm("Index", "products", FormMethod.Get))
+{
+    <div class="form-inline">
+        Enter product name: @Html.TextBox("SearchString", ViewBag.CurrentFilter as string, new { style = " height:33px" })
+        <input type="submit" class="btn btn-primary" value="Search" id="btnSearch" />
+        <button class="btn btn-info" id="create"> @Html.ActionLink("Create", "Create", new { }, new { style = "text-decoration:none; color:azure" }) </button>
+    </div>
+}
+
+<br />
+<!--Table-->
+<table class="table" id="myTable">
+    <tr>
+        <th>
+            @Html.ActionLink("Name", "Index", new { sortOrder = ViewBag.NameSort, currentFilter = ViewBag.CurrentFilter }, new { style = "text-decoration:none; color:black" })
+
+        </th>
+        <th>
+            <p>Year</p>
+        </th>
+        <th>
+            <p>Price</p>
+        </th>
+        <th>
+            <p>Brand</p>
+        </th>
+        <th>
+            <p>Catergory</p>
+        </th>
+        <th></th>
+    </tr>
+
+    <tbody>
+
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.product_name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.model_year)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.list_price)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.brand.brand_name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.category.category_name)
+                </td>
+                <td>
+                    <button class="btn btn-primary"> @Html.ActionLink("Edit", "Edit", new { id = item.product_id }, new { style = "text-decoration:none; color:#fff" })</button> |
+                    <button class="btn btn-info" id="btnDetails"> @Html.ActionLink("Details", "Details", new { id = item.product_id }, new { style = "text-decoration:none; color:#fff" }) </button> |
+                    <button class="btn btn-danger"> @Html.ActionLink("Delete", "Delete", new { id = item.product_id }, new { style = "text-decoration:none; color:#fff" }) </button>
+
+                     
+                </td>
+            </tr>
+        }
+    </tbody>
+
+</table>
+<!--Modal-->
+<div id="partialModal" class="modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title"></h3>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<br />
+Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount
+
+@Html.PagedListPager(Model, page => Url.Action("Index", new { page, sortOrder = ViewBag.CurrentSort, currentFilter = ViewBag.CurrentFilter }))
+
+
+@section Scripts{
+
+    <script type="text/javascript">
+        $("#btnDetails").on("click", () => {
+            var prodId = $(this).attr("id");
+            console.log(prodId);
+            $.ajax({
+                type: "GET",
+                url: "@Url.Action("Details", "products")",
+                data: '{productId: "' + prodId + '" }',
+                success: function (response) {
+                    $("#partialModal").find(".modal-body").html(response);
+                    $("#partialModal").modal('show');
+                },
+                failure: function (response) {
+                    alert(response.responseText);
+                },
+                }
+            });
+        });
+    </script>
+}

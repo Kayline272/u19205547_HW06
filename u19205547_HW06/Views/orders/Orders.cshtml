@@ -1,0 +1,80 @@
+﻿@*@model IEnumerable<u19205547_HW06.Models.ProductOrderJoin>*@
+
+@model PagedList.IPagedList<u19205547_HW06.Models.ProductOrderJoin>
+@using PagedList.Mvc;
+<link href="~/Content/PagedList.css" rel="stylesheet" type="text/css" />
+
+<h2>Orders</h2>
+
+<div>
+
+    @using (Html.BeginForm("Orders", "orders", FormMethod.Get))
+    {
+        <div class="form-inline">
+            <div class="input-group date" id="id_0">
+                @Html.TextBox("searchDate", ViewBag.CurrentFilterTextbox as string, new { placeholder = "YYYY/MM/DD"})
+            </div>
+            <input type="submit" class="btn btn-primary" value="Search" id="btnSearch" />
+        </div>
+    }
+</div>
+
+<div>
+    @foreach (var item in Model)
+    {
+        <h3>Order @Html.DisplayFor(modelItem => item.OrderDetails.order_id) -  @Html.DisplayFor(modelItem => item.OrderDetails.order_date)</h3>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>
+                        Product Name
+                    </th>
+                    <th>
+                        List Price
+                    </th>
+                    <th>
+                        Quantity
+                    </th>
+                    <th>
+                        Total
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ProductDetails.product_name)
+                    </td>
+                    <td class="price">
+                        @Html.DisplayFor(modelItem => item.OrderItemDetails.list_price)
+                    </td>
+                    <td class="quantity">
+                        @Html.DisplayFor(modelItem => item.OrderItemDetails.quantity)
+                    </td>
+                    <td class="total">
+                    </td>
+                </tr>
+                @*}*@
+            </tbody>
+        </table>
+    }
+
+</div>
+
+
+<br />
+Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount
+
+@Html.PagedListPager(Model, page => Url.Action("Orders", new
+{
+    page,
+    sortOrder = ViewBag.CurrentSort,
+    currentFilter = ViewBag.CurrentFilter
+}))
+
+<script>
+    $(document).ready(() => {
+       
+    });
+</script>
+
